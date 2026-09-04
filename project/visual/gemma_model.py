@@ -52,7 +52,7 @@ Use empty arrays when no items are clearly visible. Do not use Markdown or code 
 
         print(f"Using Ollama model: {self.model_name}")
 
-    async def analyze_image(self, image, prompt: str) -> dict:
+    async def analyze_image(self, image, prompt: str, task: str) -> dict:
 
         # Convert PIL image to JPEG bytes
         image_buffer = io.BytesIO()
@@ -75,7 +75,7 @@ Use empty arrays when no items are clearly visible. Do not use Markdown or code 
                 },
                 {
                     "role": "user",
-                    "content": prompt,
+                    "content": f"Requested task: {task}\nUser prompt: {prompt}",
                     "images": [
                         image_base64
                     ]

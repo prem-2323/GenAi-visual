@@ -17,6 +17,12 @@ router = APIRouter(
 
 
 gemma = GemmaModel()
+SUPPORTED_TASKS = {
+    "description",
+    "ocr",
+    "objects",
+    "summary"
+}
 
 
 @router.post(
@@ -25,10 +31,22 @@ gemma = GemmaModel()
 )
 async def analyze_image(
     image: UploadFile = File(...),
-    prompt: str = Form(...)
+    prompt: str = Form(...),
+    task: str = Form(...)
 ):
 
     try:
+
+        task = task.strip().lower()
+
+        if task not in SUPPORTED_TASKS:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Unsupported task. Choose one of: description, ocr, "
+                    "objects, summary."
+                )
+            )
 
         # 1. Validate image
         validate_image(image.content_type)
@@ -48,7 +66,8 @@ async def analyze_image(
         # 4. Send image + prompt to Gemma through Ollama
         result = await gemma.analyze_image(
             pil_image,
-            prompt
+            prompt,
+            task
         )
 
         # 5. Return response
