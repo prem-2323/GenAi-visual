@@ -7,7 +7,7 @@ from .image_processor import (
 
 from .gemma_model import GemmaModel
 
-from .schemas import VisualResponse
+from .schemas import VisualResponse, VisualTask
 
 
 router = APIRouter(
@@ -18,10 +18,7 @@ router = APIRouter(
 
 gemma = GemmaModel()
 SUPPORTED_TASKS = {
-    "description",
-    "ocr",
-    "objects",
-    "summary"
+    task.value for task in VisualTask
 }
 
 
@@ -32,12 +29,12 @@ SUPPORTED_TASKS = {
 async def analyze_image(
     image: UploadFile = File(...),
     prompt: str = Form(...),
-    task: str = Form(...)
+    task: VisualTask = Form(...)
 ):
 
     try:
 
-        task = task.strip().lower()
+        task = task.value
 
         if task not in SUPPORTED_TASKS:
             raise HTTPException(

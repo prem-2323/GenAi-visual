@@ -33,8 +33,16 @@ TASK RULES:
 4. If the user asks for a SUMMARY:
     - Summarize only clearly visible information.
 
+5. If the image contains a chart, diagram, document, screenshot, or poster:
+    - Treat readable titles, labels, legends, axis labels, and values as visible text.
+    - Treat chart bars, lines, points, tables, and other meaningful visual elements as objects.
+    - Report these elements even when the requested task focuses on description or summary.
+
 Always follow the requested task exactly.
 Never answer a different task.
+
+The requested task controls the emphasis of the description, but do not omit
+clearly visible objects, text, or important details from the structured fields.
 
 For every image request, return ONLY valid JSON with exactly these fields:
 {
@@ -109,4 +117,21 @@ Use empty arrays when no items are clearly visible. Do not use Markdown or code 
         if not isinstance(structured_result, dict):
             raise RuntimeError("Ollama returned structured data in an invalid format.")
 
-        return structured_result
+        description = structured_result.get("description", "")
+        if not isinstance(description, str):
+            description = str(description)
+
+        def string_list(field_name: str) -> list[str]:
+            values = structured_result.get(field_name, [])
+            if not isinstance(values, list):
+                return []
+            return [str(value) for value in values]
+
+        task_result = {
+            "description": description,
+            "objects": string_list("objects"),
+            "visible_text": string_list("visible_text"),
+            "important_details": string_list("important_details")
+        }
+
+        return task_result

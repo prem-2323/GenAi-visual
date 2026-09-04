@@ -1,5 +1,13 @@
 from pydantic import BaseModel
 from typing import List
+from enum import Enum
+
+
+class VisualTask(str, Enum):
+    description = "description"
+    ocr = "ocr"
+    objects = "objects"
+    summary = "summary"
 
 
 class VisualAnalysis(BaseModel):
