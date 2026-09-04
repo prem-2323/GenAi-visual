@@ -27,6 +27,11 @@ def load_image(image_bytes: bytes) -> Image.Image:
     """
 
     try:
+        image_stream = BytesIO(image_bytes)
+        image = Image.open(image_stream)
+        image.verify()
+
+        # Reopen after verify because verify() leaves the image unusable.
         image = Image.open(BytesIO(image_bytes))
 
         # Convert to RGB because Gemma expects RGB images

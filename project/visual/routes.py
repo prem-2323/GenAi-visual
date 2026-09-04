@@ -65,6 +65,10 @@ async def analyze_image(
             detail=str(e)
         )
 
+    except HTTPException:
+
+        raise
+
     except Exception as e:
 
         print(f"Error: {e}")
