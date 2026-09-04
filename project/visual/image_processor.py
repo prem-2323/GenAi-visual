@@ -1,0 +1,38 @@
+from PIL import Image
+from io import BytesIO
+
+
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg",
+    "image/jpg",
+    "image/png"
+}
+
+
+def validate_image(content_type: str):
+    """
+    Check whether uploaded file is a supported image.
+    """
+
+    if content_type not in ALLOWED_IMAGE_TYPES:
+        raise ValueError(
+            "Unsupported image format. "
+            "Only JPG, JPEG and PNG are allowed."
+        )
+
+
+def load_image(image_bytes: bytes) -> Image.Image:
+    """
+    Convert uploaded bytes into a PIL Image.
+    """
+
+    try:
+        image = Image.open(BytesIO(image_bytes))
+
+        # Convert to RGB because Gemma expects RGB images
+        image = image.convert("RGB")
+
+        return image
+
+    except Exception as e:
+        raise ValueError(f"Invalid image: {str(e)}")
